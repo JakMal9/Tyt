@@ -8,9 +8,9 @@ cur = conn.cursor()
 
 def initializationDB(cur2):
 
-        base = open("TYTDB.sql")
-        for line in base:
-                cur2.execute(line)
+        with open("TYTDB.sql") as base:
+                for line in base:
+                        cur2.execute(line)
 
 initializationDB(cur)        
 
