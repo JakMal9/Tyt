@@ -6,14 +6,13 @@ conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
 
-def my_function(base):
+def initializationDB(cur2):
+
+        base = open("TYTDB.sql")
         for line in base:
-                cur.execute(line)
+                cur2.execute(line)
 
-first_tables = open("TYTDB.sql")
-
-my_function(first_tables)        
-
+initializationDB(cur)        
 
 conn.commit()
 
