@@ -5,11 +5,14 @@ print("Welcome to tyton")
 conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
-base = open("TYTDB.sql")
 
-for line in base:
-        cur.execute(line)
+def my_function(base):
+        for line in base:
+                cur.execute(line)
 
+first_tables = open("TYTDB.sql")
+
+my_function(first_tables)        
 
 
 conn.commit()
