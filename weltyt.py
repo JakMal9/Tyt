@@ -1,16 +1,15 @@
 import sqlite3
 
-
-print("Welcome to tyton")
-conn = sqlite3.connect("TYTDB.db")
-
-cur = conn.cursor()
-
 def initializationDB(cursor):
 
         with open("TYTDB.sql") as base:
                 for line in base:
                         cursor.execute(line)
+
+print("Welcome to tyton")
+conn = sqlite3.connect("TYTDB.db")
+
+cur = conn.cursor()
 
 initializationDB(cur)        
 
