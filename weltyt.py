@@ -6,11 +6,11 @@ conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
 
-def initializationDB(cur2):
+def initializationDB(cursor):
 
         with open("TYTDB.sql") as base:
                 for line in base:
-                        cur2.execute(line)
+                        cursor.execute(line)
 
 initializationDB(cur)        
 
