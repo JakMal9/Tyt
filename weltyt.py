@@ -14,7 +14,7 @@ def show_my_resources(x):
     for rows in cur.execute("SELECT * FROM lands"):
         print(rows)
 
-def buing_plants(x):
+def buy_plants(plants):
     amount = input(
                     "How many plants do you want to buy? Write only integer please. "
                 )
@@ -23,28 +23,28 @@ def buing_plants(x):
         amount = int(amount)
 
         money_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Money" '
+            'SELECT amount  FROM resources WHERE type = "Money";'
         ).fetchone()[0]
         plants_price = cur.execute(
-            'SELECT price FROM resources WHERE type = "Plants" '
+            'SELECT price FROM resources WHERE type = "Plants";'
         ).fetchone()[0]
         new_money_amount = money_amount - amount * plants_price
         cur.execute(
-            f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money"; '
+            f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
         )
         plants_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Plants" '
+            'SELECT amount  FROM resources WHERE type = "Plants";'
         ).fetchone()[0]
         new_plants_amount = plants_amount + amount
         cur.execute(
-            f'UPDATE resources SET amount = {new_plants_amount}  WHERE type = "Plants"; '
+            f'UPDATE resources SET amount = {new_plants_amount}  WHERE type = "Plants";'
         )
-        print("Buying plants was done properly. ")
+        print("Well done plants deal. ")
     except ValueError:
         
-        print("Invalid input, to buy any plant you have to write number as integer please. ")
+        print("Invalid input, write integer only please. ")
 
-def buying_lands(x):
+def buy_lands(lands):
     show_me_lands = input("If you want see lands offert, write yes please. ")
     if show_me_lands == "yes":
         print(lands_offert)
@@ -53,27 +53,27 @@ def buying_lands(x):
         print("Go directly to buying ")
 
         
-        choose_class = input(
+        chosen_class = input(
             "What land class do you want to buy? Write only properly names of lands please. "
         )
     
         try: 
             
             add_land = cur.execute(
-                f'INSERT INTO lands VALUES ("{lands_offert[choose_class]["class"]}", {lands_offert[choose_class]["id"]}, {lands_offert[choose_class]["growth_rate"]}, {lands_offert[choose_class]["price_ISL"]}, {lands_offert[choose_class]["plants"]})'
+                f'INSERT INTO lands VALUES ("{lands_offert[choose_class]["class"]}", {lands_offert[choose_class]["id"]}, {lands_offert[choose_class]["growth_rate"]}, {lands_offert[choose_class]["price_ISL"]}, {lands_offert[choose_class]["plants"]});'
             )
             money_amount = cur.execute(
-                'SELECT amount  FROM resources WHERE type = "Money" '
+                'SELECT amount  FROM resources WHERE type = "Money";'
             ).fetchone()[0]
             lands_price = cur.execute(
-                f'SELECT price FROM lands WHERE class = "{choose_class}" '
+                f'SELECT price FROM lands WHERE class = "{choose_class}";'
             ).fetchone()[0]
             new_money_amount = money_amount - lands_price
             cur.execute(
-                f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money"; '
+                f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
             )
         
-            print(f"Buying {choose_class} is done properly ")
+            print(f"Buying {chosen_class} is done properly ")
         except KeyError:
             print("Invalid input")
 
@@ -126,23 +126,23 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". if you want avoid this step write no please. ")
+first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
 for x in first_choice:
 
 
     if first_choice == "show_my_resources":
         show_my_resources(first_choice)
-        first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\" please. ")
+        first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
 
     elif first_choice == "buy":
         what_buy = input("To start grow tobbaco you need plants and lands. To buy plants write just \"Plants\", to buy lands write \"Lands\" please. ")
         if what_buy == "Plants":
-            buing_plants(what_buy)
-            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\" please. ")
+            buy_plants(what_buy)
+            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
 
         elif what_buy == "Lands":
-            buying_lands(what_buy)
-            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\" please. ")
+            buy_lands(what_buy)
+            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
                    
         elif what_buy == "no":
             print("Shopping is finished ")
@@ -151,41 +151,15 @@ for x in first_choice:
 
         else:
             print("Invalid input")
-            
+            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
 
 
 
 else:
-    print("Shopping is finished ")
-    print("Go forward")
+    print("Invalid input")
+    first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
 
-
-    #if buying_lands == "Lands":
-        
-        # elif choose_class == "humus_sag":
-        #     add_humus_sag = cur.execute('INSERT INTO lands VALUES ("humus_sag", 2, 4, 400, 0)')
-
-        # elif choose_class == "brown_soil":
-        #     add_brown_soil = cur.execute('INSERT INTO lands VALUES ("brown_soil", 3, 3, 350, 0)')
-
-        # elif choose_class == "lessive_soil":
-        #     add_lessive_soil = cur.execute('INSERT INTO lands VALUES ("lessive_soil", 4, 2, 250, 0)')
-
-        # elif choose_class == "clay_gravel":
-        #     add_clay_gravel = cur.execute('INSERT INTO lands VALUES ("clay_gravel", 5, 1, 200, 0)')
-
-    # amount = int(input("How many plants do you want to buy? "))
-
-    # money_amount = cur.execute('SELECT amount  FROM resources WHERE type = "Money" ').fetchone()[0]
-    # plants_price = cur.execute('SELECT price FROM resources WHERE type = "Plants" ').fetchone()[0]
-    # new_money_amount =  money_amount - amount * plants_price
-    # cur.execute(f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money"; ')
-
-    # plants_amount = cur.execute('SELECT amount  FROM resources WHERE type = "Plants" ').fetchone()[0]
-    # new_plants_amount = plants_amount + amount
-    # cur.execute(f'UPDATE resources SET amount = {new_plants_amount}  WHERE type = "Plants"; ')
-
-    #else:
-       # print("Shopping is finished ")
+print("Shopping is finished ")
+print("Go forward")
 
 conn.close()
