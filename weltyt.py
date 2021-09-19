@@ -45,7 +45,9 @@ def buy_plants(plants):
         print("Invalid input, write integer only please. ")
 
 def buy_lands(lands):
-    show_me_lands = input("If you want see lands offert, write yes please. ")
+    show_me_lands = input("If you want see lands offert, write yes please. \
+        \
+        ")
     if show_me_lands == "yes":
         print(lands_offert)
 
@@ -54,7 +56,9 @@ def buy_lands(lands):
 
         
         chosen_class = input(
-            "What land class do you want to buy? Write only properly names of lands please. "
+            "What land class do you want to buy? Write only properly names of lands please. \
+            \
+            "
         )
     
         try: 
@@ -126,23 +130,33 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
-for x in first_choice:
+first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. \
+    \
+    ")
+for choice in first_choice:
 
 
     if first_choice == "show_my_resources":
         show_my_resources(first_choice)
-        first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
+        first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. \
+            \
+            ")
 
     elif first_choice == "buy":
-        what_buy = input("To start grow tobbaco you need plants and lands. To buy plants write just \"Plants\", to buy lands write \"Lands\" please. ")
+        what_buy = input("To start grow tobbaco you need plants and lands. To buy plants write just \"Plants\", to buy lands write \"Lands\" please. \
+            \
+            ")
         if what_buy == "Plants":
             buy_plants(what_buy)
-            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
+            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. \
+                \
+                ")
 
         elif what_buy == "Lands":
             buy_lands(what_buy)
-            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
+            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. \
+                \
+                ")
                    
         elif what_buy == "no":
             print("Shopping is finished ")
@@ -151,15 +165,19 @@ for x in first_choice:
 
         else:
             print("Invalid input")
-            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
+            first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. \
+                \
+                ")
 
 
 
 else:
     print("Invalid input")
-    first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. ")
+    first_choice = input("Choose what would you like to do. If you want check your resources write \"show_my_resources\" please. If you want go directly to buying, write \"buy\". If you want avoid this step write \"no\" please. \
+        \
+        ")
 
-print("Shopping is finished ")
+print("Shopping is finished")
 print("Go forward")
 
 conn.close()
