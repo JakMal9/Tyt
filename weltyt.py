@@ -66,13 +66,13 @@ def buy_lands(lands):
         try:
 
             add_land = cur.execute(
-                f'INSERT INTO lands VALUES ("{lands_offert[choose_class]["class"]}", {lands_offert[choose_class]["id"]}, {lands_offert[choose_class]["growth_rate"]}, {lands_offert[choose_class]["price_ISL"]}, {lands_offert[choose_class]["plants"]});'
+                f'INSERT INTO lands VALUES ("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["id"]}, {lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, {lands_offert[chosen_class]["plants"]});'
             )
             money_amount = cur.execute(
                 'SELECT amount  FROM resources WHERE type = "Money";'
             ).fetchone()[0]
             lands_price = cur.execute(
-                f'SELECT price FROM lands WHERE class = "{choose_class}";'
+                f'SELECT price FROM lands WHERE class = "{chosen_class}";'
             ).fetchone()[0]
             new_money_amount = money_amount - lands_price
             cur.execute(
@@ -168,10 +168,6 @@ for choice in first_choice:
                 '
             )
 
-        elif what_buy == "no":
-            print("Shopping is finished ")
-            break
-
         else:
             print("Invalid input")
             first_choice = input(
@@ -179,17 +175,18 @@ for choice in first_choice:
                 \
                 '
             )
+    elif first_choice == "no":
+            print("Shopping is finished ")
+            break
 
+    else:
+        print("Invalid input")
+        first_choice = input(
+            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
+            \
+            '
+        )
 
-else:
-    print("Invalid input")
-    first_choice = input(
-        'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-        \
-        '
-    )
-
-print("Shopping is finished")
 print("Go forward")
 
 conn.close()
