@@ -44,6 +44,33 @@ def buy_plants(plants):
 
         print("Invalid input, write integer only please. ")
 
+def buy_pesticides(pesticides):
+    amount = input("How many pesticides do you want to buy? Write only integer please. ")
+
+    try:
+        amount = int(amount)
+
+        money_amount = cur.execute(
+            'SELECT amount  FROM resources WHERE type = "Money";'
+        ).fetchone()[0]
+        pesticides_price = cur.execute(
+            'SELECT price FROM resources WHERE type = "Pesticides";'
+        ).fetchone()[0]
+        new_money_amount = money_amount - amount * pesticides_price
+        cur.execute(
+            f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
+        )
+        pesticides_amount = cur.execute(
+            'SELECT amount  FROM resources WHERE type = "Pesticides";'
+        ).fetchone()[0]
+        new_pesticides_amount = pesticides_amount + amount
+        cur.execute(
+            f'UPDATE resources SET amount = {new_pesticides_amount}  WHERE type = "Pesticides";'
+        )
+        print("Well done pesticides deal. ")
+    except ValueError:
+
+        print("Invalid input, write integer only please. ")
 
 def buy_lands(lands):
     show_me_lands = input(
@@ -151,7 +178,7 @@ for choice in first_choice:
 
     elif first_choice == "buy":
         what_buy = input(
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
+            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands", to buy pesticides write "Pesticides" please. \
             \
             '
         )
@@ -166,6 +193,14 @@ for choice in first_choice:
 
         elif what_buy == "Lands":
             buy_lands(what_buy)
+            first_choice = input(
+                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
+                \
+                '
+            )
+
+        elif what_buy == "Pesticides":
+            buy_pesticides(what_buy)
             first_choice = input(
                 'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
                 \
