@@ -122,7 +122,10 @@ lands_offert = {
     },
 }
 
+Help = {"show_my_resources": "Shows you what resources you have exactly in this time.", "buy": "shows what is possible to buy in this round.", "Plants": "Opens posibility of buying plants.", "Lands": "Opens posibility of buying lands."}
+
 print("Welcome to tyton")
+print("In every input if you write \"Help\", you will see explonation of all options which you use.")
 conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
@@ -152,6 +155,7 @@ for choice in first_choice:
             \
             '
         )
+        
         if what_buy == "Plants":
             buy_plants(what_buy)
             first_choice = input(
@@ -167,6 +171,14 @@ for choice in first_choice:
                 \
                 '
             )
+        
+        elif what_buy == "Help":
+            print(Help)
+            what_buy = input(
+            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
+            \
+            '
+        )
 
         else:
             print("Invalid input")
@@ -175,6 +187,15 @@ for choice in first_choice:
                 \
                 '
             )
+
+    elif first_choice == "Help":
+        print(Help)
+        first_choice = input(
+            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
+            \
+            '
+        )
+
     elif first_choice == "no":
             print("Shopping is finished ")
             break
