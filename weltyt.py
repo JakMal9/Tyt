@@ -122,10 +122,10 @@ lands_offert = {
     },
 }
 
-Help = {"show_my_resources": "Shows you what resources you have exactly in this time.", "buy": "shows what is possible to buy in this round.", "Plants": "Opens posibility of buying plants.", "Lands": "Opens posibility of buying lands."}
+commands = {"Help":"Explain all commands", "show_my_resources": "Shows you what resources you have exactly in this time.", "buy": "shows what is possible to buy in this round.", "Plants": "Opens posibility of buying plants.", "Lands": "Opens posibility of buying lands."}
 
 print("Welcome to tyton")
-print("In every input if you write \"Help\", you will see explonation of all options which you use.")
+print("In every input if you write \"Help\", you will see explanation of all options which you can use.")
 conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
@@ -139,7 +139,7 @@ first_choice = input(
     \
     '
 )
-for choice in first_choice:
+while True:
 
     if first_choice == "show_my_resources":
         show_my_resources(first_choice)
@@ -150,32 +150,32 @@ for choice in first_choice:
         )
 
     elif first_choice == "buy":
-        what_buy = input(
+        user_choice = input(
             'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
             \
             '
         )
         
-        if what_buy == "Plants":
-            buy_plants(what_buy)
+        if user_choice == "Plants":
+            buy_plants(user_choice)
             first_choice = input(
                 'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
                 \
                 '
             )
 
-        elif what_buy == "Lands":
-            buy_lands(what_buy)
+        elif user_choice == "Lands":
+            buy_lands(user_choice)
             first_choice = input(
                 'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
                 \
                 '
             )
         
-        elif what_buy == "Help":
-            print(Help)
-            what_buy = input(
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
+        elif user_choice == "Help":
+            print(commands)
+            user_choice = input(
+            'To start growing tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
             \
             '
         )
@@ -189,7 +189,7 @@ for choice in first_choice:
             )
 
     elif first_choice == "Help":
-        print(Help)
+        print(commands)
         first_choice = input(
             'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
             \
