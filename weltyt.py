@@ -124,6 +124,12 @@ lands_offert = {
 
 commands = {"Help":"Explain all commands", "show_my_resources": "Shows you what resources you have exactly in this time.", "buy": "shows what is possible to buy in this round.", "Plants": "Opens posibility of buying plants.", "Lands": "Opens posibility of buying lands."}
 
+listva = ['Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please.\n',
+            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please.\n',
+            ]
+
+print(commands.keys())
+
 print("Welcome to tyton")
 print("In every input if you write \"Help\", you will see explanation of all options which you can use.")
 conn = sqlite3.connect("TYTDB.db")
@@ -134,66 +140,50 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input(
-    'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-    \
-    '
-)
+first_choice = input( listva[0])
+    
+
 while True:
 
     if first_choice == "show_my_resources":
         show_my_resources(first_choice)
         first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
+            listva[0]
         )
 
     elif first_choice == "buy":
         user_choice = input(
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
-            \
-            '
+            listva[1]
         )
         
         if user_choice == "Plants":
             buy_plants(user_choice)
             first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
+              listva[0]
             )
 
         elif user_choice == "Lands":
             buy_lands(user_choice)
             first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
+               listva[0]
             )
         
         elif user_choice == "Help":
             print(commands)
             user_choice = input(
-            'To start growing tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
-            \
-            '
+           listva[1]
         )
 
         else:
             print("Invalid input")
             first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
+               listva[0]
             )
 
     elif first_choice == "Help":
         print(commands)
         first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
+            listva[0]
         )
 
     elif first_choice == "no":
@@ -203,9 +193,7 @@ while True:
     else:
         print("Invalid input")
         first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
+            listva[0]
         )
 
 print("Go forward")
