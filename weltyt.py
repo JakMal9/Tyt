@@ -122,7 +122,36 @@ lands_offert = {
     },
 }
 
+explanation = {
+    "Help": "Explain all commands",
+    "show_my_resources": "Shows you what resources you have exactly in this " "time.",
+    "buy": "shows what is possible to buy in this round.",
+    "Plants": "Opens posibility of buying plants.",
+    "Lands": "Opens posibility of buying lands.",
+}
+
+commands = {
+    "help": "Help",
+    "show_my_resources": "show_my_resources",
+    "buy": "buy",
+    "plants": "Plants",
+    "lands": "Lands",
+}
+
+messages = {
+    "first_choice": "Choose what would you like to do. If you want check your resources write "
+    '"show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" '
+    " please.\n",
+    "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
+    'to buy lands write "Lands" please.\n',
+}
+
+print(explanation.keys())
+
 print("Welcome to tyton")
+print(
+    'In every input if you write "Help", you will see explanation of all options which you can use.'
+)
 conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
@@ -131,61 +160,45 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input(
-    'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-    \
-    '
-)
-for choice in first_choice:
+first_choice = input(messages["first_choice"])
 
-    if first_choice == "show_my_resources":
+
+while True:
+
+    if first_choice == commands["show_my_resources"]:
         show_my_resources(first_choice)
-        first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
-        )
+        first_choice = input(messages["first_choice"])
 
-    elif first_choice == "buy":
-        what_buy = input(
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
-            \
-            '
-        )
-        if what_buy == "Plants":
-            buy_plants(what_buy)
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
+    elif first_choice == commands["buy"]:
+        user_choice = input(messages["user_choice"])
 
-        elif what_buy == "Lands":
-            buy_lands(what_buy)
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
+        if user_choice == commands["plants"]:
+            buy_plants(user_choice)
+            first_choice = input(messages["first_choice"])
+
+        elif user_choice == commands["lands"]:
+            buy_lands(user_choice)
+            first_choice = input(messages["first_choice"])
+
+        elif user_choice == commands["help"]:
+            print(explanation)
+            user_choice = input(messages["user_choice"])
 
         else:
             print("Invalid input")
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
+            first_choice = input(messages["first_choice"])
+
+    elif first_choice == commands["help"]:
+        print(explanation)
+        first_choice = input(messages["first_choice"])
+
     elif first_choice == "no":
-            print("Shopping is finished ")
-            break
+        print("Shopping is finished ")
+        break
 
     else:
         print("Invalid input")
-        first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
-        )
+        first_choice = input(messages["first_choice"])
 
 print("Go forward")
 
