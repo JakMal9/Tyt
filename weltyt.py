@@ -122,16 +122,36 @@ lands_offert = {
     },
 }
 
-commands = {"Help":"Explain all commands", "show_my_resources": "Shows you what resources you have exactly in this time.", "buy": "shows what is possible to buy in this round.", "Plants": "Opens posibility of buying plants.", "Lands": "Opens posibility of buying lands."}
+explanation = {
+    "Help": "Explain all commands",
+    "show_my_resources": "Shows you what resources you have exactly in this " "time.",
+    "buy": "shows what is possible to buy in this round.",
+    "Plants": "Opens posibility of buying plants.",
+    "Lands": "Opens posibility of buying lands.",
+}
 
-listva = ['Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please.\n',
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please.\n',
-            ]
+commands = {
+    "help": "Help",
+    "show_my_resources": "show_my_resources",
+    "buy": "buy",
+    "plants": "Plants",
+    "lands": "Lands",
+}
 
-print(commands.keys())
+messages = {
+    "first_choice": "Choose what would you like to do. If you want check your resources write "
+    '"show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" '
+    " please.\n",
+    "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
+    'to buy lands write "Lands" please.\n',
+}
+
+print(explanation.keys())
 
 print("Welcome to tyton")
-print("In every input if you write \"Help\", you will see explanation of all options which you can use.")
+print(
+    'In every input if you write "Help", you will see explanation of all options which you can use.'
+)
 conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
@@ -140,61 +160,45 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input( listva[0])
-    
+first_choice = input(messages["first_choice"])
+
 
 while True:
 
-    if first_choice == "show_my_resources":
+    if first_choice == commands["show_my_resources"]:
         show_my_resources(first_choice)
-        first_choice = input(
-            listva[0]
-        )
+        first_choice = input(messages["first_choice"])
 
-    elif first_choice == "buy":
-        user_choice = input(
-            listva[1]
-        )
-        
-        if user_choice == "Plants":
+    elif first_choice == commands["buy"]:
+        user_choice = input(messages["user_choice"])
+
+        if user_choice == commands["plants"]:
             buy_plants(user_choice)
-            first_choice = input(
-              listva[0]
-            )
+            first_choice = input(messages["first_choice"])
 
-        elif user_choice == "Lands":
+        elif user_choice == commands["lands"]:
             buy_lands(user_choice)
-            first_choice = input(
-               listva[0]
-            )
-        
-        elif user_choice == "Help":
-            print(commands)
-            user_choice = input(
-           listva[1]
-        )
+            first_choice = input(messages["first_choice"])
+
+        elif user_choice == commands["help"]:
+            print(explanation)
+            user_choice = input(messages["user_choice"])
 
         else:
             print("Invalid input")
-            first_choice = input(
-               listva[0]
-            )
+            first_choice = input(messages["first_choice"])
 
-    elif first_choice == "Help":
-        print(commands)
-        first_choice = input(
-            listva[0]
-        )
+    elif first_choice == commands["help"]:
+        print(explanation)
+        first_choice = input(messages["first_choice"])
 
     elif first_choice == "no":
-            print("Shopping is finished ")
-            break
+        print("Shopping is finished ")
+        break
 
     else:
         print("Invalid input")
-        first_choice = input(
-            listva[0]
-        )
+        first_choice = input(messages["first_choice"])
 
 print("Go forward")
 
