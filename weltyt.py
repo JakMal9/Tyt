@@ -15,18 +15,17 @@ def show_my_resources(x):
     for rows in cur.execute("SELECT * FROM lands"):
         print(rows)
 
-def get_resource(column, resource_type):
-        return cur.execute(
+
+def get_resource_value(column, resource_type):
+    return cur.execute(
         f'SELECT "{column}" FROM resources WHERE type = "{resource_type}";'
     ).fetchone()[0]
 
 
-
-def update_resource(amount, resource_type):
+def update_resource_amount(amount, resource_type):
     cur.execute(
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
-
 
 
 def buy_plants(plants):
@@ -35,17 +34,17 @@ def buy_plants(plants):
     try:
         amount = int(amount)
 
-        money_amount = get_resource("amount", "Money")
-        plants_price = get_resource("price", "Plants")
-            
+        money_amount = get_resource_value("amount", "Money")
+        plants_price = get_resource_value("price", "Plants")
+
         new_money_amount = money_amount - amount * plants_price
-        update_resource(new_money_amount, "Money")
-        
-        plants_amount = get_resource("amount", "Plants")
-        
+        update_resource_amount(new_money_amount, "Money")
+
+        plants_amount = get_resource_value("amount", "Plants")
+
         new_plants_amount = plants_amount + amount
-        update_resource(new_plants_amount, "Plants")
-    
+        update_resource_amount(new_plants_amount, "Plants")
+
         print("Well done plants deal. ")
     except ValueError:
 
@@ -53,22 +52,24 @@ def buy_plants(plants):
 
 
 def buy_pesticides(pesticides):
-    amount = input("How many pesticides do you want to buy? Write only integer please. ")
+    amount = input(
+        "How many pesticides do you want to buy? Write only integer please. "
+    )
 
     try:
         amount = int(amount)
 
-        money_amount = get_resource("amount", "Money")
-        pesticides_price = get_resource("price", "Pesticides")
-            
+        money_amount = get_resource_value("amount", "Money")
+        pesticides_price = get_resource_value("price", "Pesticides")
+
         new_money_amount = money_amount - amount * pesticides_price
-        update_resource(new_money_amount, "Money")
-            
-        pesticides_amount = get_resource("amount", "Pesticides")
-        
+        update_resource_amount(new_money_amount, "Money")
+
+        pesticides_amount = get_resource_value("amount", "Pesticides")
+
         new_pesticides_amount = pesticides_amount + amount
-        update_resource(new_pesticides_amount, "Pesticides")
-     
+        update_resource_amount(new_pesticides_amount, "Pesticides")
+
         print("Well done pesticides deal. ")
     except ValueError:
 
@@ -166,7 +167,7 @@ commands = {
     "buy": "buy",
     "plants": "Plants",
     "lands": "Lands",
-    "pesticides": "Pesticides"
+    "pesticides": "Pesticides",
 }
 
 messages = {
