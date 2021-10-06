@@ -15,34 +15,42 @@ def show_my_resources(x):
     for rows in cur.execute("SELECT * FROM lands"):
         print(rows)
 
+def get_resource(column, resource_type):
+        return cur.execute(
+        f'SELECT "{column}" FROM resources WHERE type = "{resource_type}";'
+    ).fetchone()[0]
+
+
+
+def update_resource(amount, resource_type):
+    cur.execute(
+        f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
+    )
+
+
 
 def buy_plants(plants):
-    amount = input("How many plants do you want to buy? Write only integer please. ")
+    amount = input("How many plants do you want to buy? Provide only integer please. ")
 
     try:
         amount = int(amount)
 
-        money_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Money";'
-        ).fetchone()[0]
-        plants_price = cur.execute(
-            'SELECT price FROM resources WHERE type = "Plants";'
-        ).fetchone()[0]
+        money_amount = get_resource("amount", "Money")
+        plants_price = get_resource("price", "Plants")
+            
         new_money_amount = money_amount - amount * plants_price
-        cur.execute(
-            f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-        )
-        plants_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Plants";'
-        ).fetchone()[0]
+        update_resource(new_money_amount, "Money")
+        
+        plants_amount = get_resource("amount", "Plants")
+        
         new_plants_amount = plants_amount + amount
-        cur.execute(
-            f'UPDATE resources SET amount = {new_plants_amount}  WHERE type = "Plants";'
-        )
+        update_resource(new_plants_amount, "Plants")
+    
         print("Well done plants deal. ")
     except ValueError:
 
-        print("Invalid input, write integer only please. ")
+        print("Invalid input, provide integer only please. ")
+
 
 def buy_pesticides(pesticides):
     amount = input("How many pesticides do you want to buy? Write only integer please. ")
@@ -50,27 +58,22 @@ def buy_pesticides(pesticides):
     try:
         amount = int(amount)
 
-        money_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Money";'
-        ).fetchone()[0]
-        pesticides_price = cur.execute(
-            'SELECT price FROM resources WHERE type = "Pesticides";'
-        ).fetchone()[0]
+        money_amount = get_resource("amount", "Money")
+        pesticides_price = get_resource("price", "Pesticides")
+            
         new_money_amount = money_amount - amount * pesticides_price
-        cur.execute(
-            f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-        )
-        pesticides_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Pesticides";'
-        ).fetchone()[0]
+        update_resource(new_money_amount, "Money")
+            
+        pesticides_amount = get_resource("amount", "Pesticides")
+        
         new_pesticides_amount = pesticides_amount + amount
-        cur.execute(
-            f'UPDATE resources SET amount = {new_pesticides_amount}  WHERE type = "Pesticides";'
-        )
+        update_resource(new_pesticides_amount, "Pesticides")
+     
         print("Well done pesticides deal. ")
     except ValueError:
 
         print("Invalid input, write integer only please. ")
+
 
 def buy_lands(lands):
     show_me_lands = input(
@@ -149,10 +152,37 @@ lands_offert = {
     },
 }
 
-Help = {"show_my_resources": "Shows you what resources you have exactly in this time.", "buy": "shows what is possible to buy in this round.", "Plants": "Opens posibility of buying plants.", "Lands": "Opens posibility of buying lands."}
+explanation = {
+    "Help": "Explain all commands",
+    "show_my_resources": "Shows you what resources you have exactly in this " "time.",
+    "buy": "shows what is possible to buy in this round.",
+    "Plants": "Opens posibility of buying plants.",
+    "Lands": "Opens posibility of buying lands.",
+}
+
+commands = {
+    "help": "Help",
+    "show_my_resources": "show_my_resources",
+    "buy": "buy",
+    "plants": "Plants",
+    "lands": "Lands",
+    "pesticides": "Pesticides"
+}
+
+messages = {
+    "first_choice": "Choose what would you like to do. If you want check your resources write "
+    '"show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" '
+    " please.\n",
+    "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
+    'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
+}
+
+print(explanation.keys())
 
 print("Welcome to tyton")
-print("In every input if you write \"Help\", you will see explonation of all options which you use.")
+print(
+    'In every input if you write "Help", you will see explanation of all options which you can use.'
+)
 conn = sqlite3.connect("TYTDB.db")
 
 cur = conn.cursor()
@@ -161,87 +191,49 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input(
-    'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-    \
-    '
-)
-for choice in first_choice:
+first_choice = input(messages["first_choice"])
 
-    if first_choice == "show_my_resources":
+
+while True:
+
+    if first_choice == commands["show_my_resources"]:
         show_my_resources(first_choice)
-        first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
-        )
+        first_choice = input(messages["first_choice"])
 
-    elif first_choice == "buy":
-        what_buy = input(
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands", to buy pesticides write "Pesticides" please. \
-            \
-            '
-        )
-        
-        if what_buy == "Plants":
-            buy_plants(what_buy)
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
+    elif first_choice == commands["buy"]:
+        user_choice = input(messages["user_choice"])
 
-        elif what_buy == "Lands":
-            buy_lands(what_buy)
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
+        if user_choice == commands["plants"]:
+            buy_plants(user_choice)
+            first_choice = input(messages["first_choice"])
 
-        elif what_buy == "Pesticides":
-            buy_pesticides(what_buy)
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
-        
-        elif what_buy == "Help":
-            print(Help)
-            what_buy = input(
-            'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", to buy lands write "Lands" please. \
-            \
-            '
-        )
+        elif user_choice == commands["lands"]:
+            buy_lands(user_choice)
+            first_choice = input(messages["first_choice"])
+
+        elif user_choice == commands["pesticides"]:
+            buy_pesticides(user_choice)
+            first_choice = input(messages["first_choice"])
+
+        elif user_choice == commands["help"]:
+            print(explanation)
+            user_choice = input(messages["user_choice"])
 
         else:
             print("Invalid input")
-            first_choice = input(
-                'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-                \
-                '
-            )
+            first_choice = input(messages["first_choice"])
 
-    elif first_choice == "Help":
-        print(Help)
-        first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
-        )
+    elif first_choice == commands["help"]:
+        print(explanation)
+        first_choice = input(messages["first_choice"])
 
     elif first_choice == "no":
-            print("Shopping is finished ")
-            break
+        print("Shopping is finished ")
+        break
 
     else:
         print("Invalid input")
-        first_choice = input(
-            'Choose what would you like to do. If you want check your resources write "show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" please. \
-            \
-            '
-        )
+        first_choice = input(messages["first_choice"])
 
 print("Go forward")
 
