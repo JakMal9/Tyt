@@ -197,6 +197,7 @@ first_choice = input(messages["first_choice"])
 
 while True:
 
+
     if first_choice == commands["show_my_resources"]:
         show_my_resources(first_choice)
         first_choice = input(messages["first_choice"])
