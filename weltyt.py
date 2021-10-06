@@ -16,30 +16,61 @@ def show_my_resources(x):
         print(rows)
 
 
+def get_resource_value(column, resource_type):
+    return cur.execute(
+        f'SELECT "{column}" FROM resources WHERE type = "{resource_type}";'
+    ).fetchone()[0]
+
+
+def update_resource_amount(amount, resource_type):
+    cur.execute(
+        f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
+    )
+
+
 def buy_plants(plants):
-    amount = input("How many plants do you want to buy? Write only integer please. ")
+    amount = input("How many plants do you want to buy? Provide only integer please. ")
 
     try:
         amount = int(amount)
 
-        money_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Money";'
-        ).fetchone()[0]
-        plants_price = cur.execute(
-            'SELECT price FROM resources WHERE type = "Plants";'
-        ).fetchone()[0]
+        money_amount = get_resource_value("amount", "Money")
+        plants_price = get_resource_value("price", "Plants")
+
         new_money_amount = money_amount - amount * plants_price
-        cur.execute(
-            f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-        )
-        plants_amount = cur.execute(
-            'SELECT amount  FROM resources WHERE type = "Plants";'
-        ).fetchone()[0]
+        update_resource_amount(new_money_amount, "Money")
+
+        plants_amount = get_resource_value("amount", "Plants")
+
         new_plants_amount = plants_amount + amount
-        cur.execute(
-            f'UPDATE resources SET amount = {new_plants_amount}  WHERE type = "Plants";'
-        )
+        update_resource_amount(new_plants_amount, "Plants")
+
         print("Well done plants deal. ")
+    except ValueError:
+
+        print("Invalid input, provide integer only please. ")
+
+
+def buy_pesticides(pesticides):
+    amount = input(
+        "How many pesticides do you want to buy? Write only integer please. "
+    )
+
+    try:
+        amount = int(amount)
+
+        money_amount = get_resource_value("amount", "Money")
+        pesticides_price = get_resource_value("price", "Pesticides")
+
+        new_money_amount = money_amount - amount * pesticides_price
+        update_resource_amount(new_money_amount, "Money")
+
+        pesticides_amount = get_resource_value("amount", "Pesticides")
+
+        new_pesticides_amount = pesticides_amount + amount
+        update_resource_amount(new_pesticides_amount, "Pesticides")
+
+        print("Well done pesticides deal. ")
     except ValueError:
 
         print("Invalid input, write integer only please. ")
@@ -136,6 +167,7 @@ commands = {
     "buy": "buy",
     "plants": "Plants",
     "lands": "Lands",
+    "pesticides": "Pesticides",
 }
 
 messages = {
@@ -143,7 +175,7 @@ messages = {
     '"show_my_resources" please. If you want go directly to buying, write "buy". If you want avoid this step write "no" '
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
-    'to buy lands write "Lands" please.\n',
+    'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
 }
 
 print(explanation.keys())
@@ -165,6 +197,7 @@ first_choice = input(messages["first_choice"])
 
 while True:
 
+
     if first_choice == commands["show_my_resources"]:
         show_my_resources(first_choice)
         first_choice = input(messages["first_choice"])
@@ -178,6 +211,10 @@ while True:
 
         elif user_choice == commands["lands"]:
             buy_lands(user_choice)
+            first_choice = input(messages["first_choice"])
+
+        elif user_choice == commands["pesticides"]:
+            buy_pesticides(user_choice)
             first_choice = input(messages["first_choice"])
 
         elif user_choice == commands["help"]:
