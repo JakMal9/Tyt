@@ -239,4 +239,55 @@ while True:
 
 print("Go forward")
 
+second_choice = input("What land do you choose to plant? Provide properly name of your land." 
+    "To check your resources write \"show_my_resources\" To avoid this step, write \"no\" please.\n")
+
+while True:
+
+    if second_choice == "no":
+        break
+        print("Planting in finished.")
+
+    elif second_choice == "show_my_resources":
+        show_my_resources(second_choice)
+        second_choice = input("What land do you choose to plant? Provide properly name of your land." 
+        "To check your resources write \"show_my_resources\" To avoid this step, write \"no\" please.\n")
+
+    else:    
+        
+
+        try:
+            planting_amount = input("How many plants do you want to plant in your land?       ")
+            planting_amount = int(planting_amount)
+
+            plants_in_lands = cur.execute(
+                    f'SELECT plants  FROM lands WHERE class = "{second_choice}";'
+                ).fetchone()[0]
+            new_plants_in_lands = plants_in_lands + planting_amount
+
+            cur.execute(
+                f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE class = "{second_choice}";'
+            )
+
+            plants_in_resources = get_resource_value("amount", "Plants")
+            new_plants_in_resources = plants_in_resources - planting_amount
+            update_resource_amount(new_plants_in_resources, "Plants")
+
+            print(f"Well done planting in {second_choice}. ")
+
+        except ValueError:
+            print("Invalid input, write integer only please. ")
+
+        except KeyError:
+            print("Invalid input")
+
+        except TypeError:
+            print("Invalid land input, provide properly name.")
+
+        second_choice = input("What land do you choose to plant? Provide properly name of your land." 
+        "To check your resources write \"show_my_resources\" To avoid this step, write \"no\" please.\n")
+            
+
+print("Go forward")
+
 conn.close()
