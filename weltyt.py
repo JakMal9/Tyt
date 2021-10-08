@@ -176,6 +176,8 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
+    "second_choice": "What land do you choose to plant? Provide properly name of your land."
+    'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
 print(explanation.keys())
@@ -196,7 +198,6 @@ first_choice = input(messages["first_choice"])
 
 
 while True:
-
 
     if first_choice == commands["show_my_resources"]:
         show_my_resources(first_choice)
@@ -239,8 +240,7 @@ while True:
 
 print("Go forward")
 
-second_choice = input("What land do you choose to plant? Provide properly name of your land." 
-    "To check your resources write \"show_my_resources\" To avoid this step, write \"no\" please.\n")
+second_choice = input(messages["second_choice"])
 
 while True:
 
@@ -248,21 +248,21 @@ while True:
         break
         print("Planting in finished.")
 
-    elif second_choice == "show_my_resources":
+    elif second_choice == commands["show_my_resources"]:
         show_my_resources(second_choice)
-        second_choice = input("What land do you choose to plant? Provide properly name of your land." 
-        "To check your resources write \"show_my_resources\" To avoid this step, write \"no\" please.\n")
+        second_choice = input(messages["second_choice"])
 
-    else:    
-        
+    else:
 
         try:
-            planting_amount = input("How many plants do you want to plant in your land?       ")
+            planting_amount = input(
+                "How many plants do you want to plant in your land?       "
+            )
             planting_amount = int(planting_amount)
 
             plants_in_lands = cur.execute(
-                    f'SELECT plants  FROM lands WHERE class = "{second_choice}";'
-                ).fetchone()[0]
+                f'SELECT plants  FROM lands WHERE class = "{second_choice}";'
+            ).fetchone()[0]
             new_plants_in_lands = plants_in_lands + planting_amount
 
             cur.execute(
@@ -284,9 +284,8 @@ while True:
         except TypeError:
             print("Invalid land input, provide properly name.")
 
-        second_choice = input("What land do you choose to plant? Provide properly name of your land." 
-        "To check your resources write \"show_my_resources\" To avoid this step, write \"no\" please.\n")
-            
+        second_choice = input(messages["second_choice"])
+
 
 print("Go forward")
 
