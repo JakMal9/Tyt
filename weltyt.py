@@ -48,7 +48,7 @@ def buy_plants(plants):
         print("Well done plants deal. ")
     except ValueError:
 
-        print("Invalid input, provide integer only please. ")
+        print(errors["only_integer"])
 
 
 def buy_pesticides(pesticides):
@@ -73,7 +73,7 @@ def buy_pesticides(pesticides):
         print("Well done pesticides deal. ")
     except ValueError:
 
-        print("Invalid input, write integer only please. ")
+        print(errors["only_integer"])
 
 
 def buy_lands(lands):
@@ -176,9 +176,11 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
-    "second_choice": "What land do you choose to plant? Provide properly name of your land."
+    "second_choice": "What land do you choose to plant? Provide proper name of your land."
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
+
+errors = {"only_integer": "Invalid input, write integer only please. "}
 
 print(explanation.keys())
 
@@ -265,24 +267,26 @@ while True:
             ).fetchone()[0]
             new_plants_in_lands = plants_in_lands + planting_amount
 
-            cur.execute(
-                f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE class = "{second_choice}";'
-            )
+            if new_plants_in_lands > 100:
+                print("On one land you can plant only 100 plants")
 
-            plants_in_resources = get_resource_value("amount", "Plants")
-            new_plants_in_resources = plants_in_resources - planting_amount
-            update_resource_amount(new_plants_in_resources, "Plants")
+            else:
 
-            print(f"Well done planting in {second_choice}. ")
+                cur.execute(
+                    f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE class = "{second_choice}";'
+                )
+
+                plants_in_resources = get_resource_value("amount", "Plants")
+                new_plants_in_resources = plants_in_resources - planting_amount
+                update_resource_amount(new_plants_in_resources, "Plants")
+
+                print(f"Well done planting in {second_choice}. ")
 
         except ValueError:
-            print("Invalid input, write integer only please. ")
-
-        except KeyError:
-            print("Invalid input")
+            print(errors["only_integer"])
 
         except TypeError:
-            print("Invalid land input, provide properly name.")
+            print("Invalid land input, provide proper name.")
 
         second_choice = input(messages["second_choice"])
 
