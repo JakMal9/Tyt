@@ -23,9 +23,14 @@ def get_resource_value(column, resource_type):
 
 
 def update_resource_amount(amount, resource_type):
+    # if amount > 0:
     cur.execute(
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
+
+
+# else:
+#     print("There is not enough resources to finish this operation.")
 
 
 def buy_plants(plants):
@@ -38,14 +43,17 @@ def buy_plants(plants):
         plants_price = get_resource_value("price", "Plants")
 
         new_money_amount = money_amount - amount * plants_price
-        update_resource_amount(new_money_amount, "Money")
+        if new_money_amount < 0:
+            print("There is not enough money to finish this operation.")
+        else:
+            update_resource_amount(new_money_amount, "Money")
 
-        plants_amount = get_resource_value("amount", "Plants")
+            plants_amount = get_resource_value("amount", "Plants")
 
-        new_plants_amount = plants_amount + amount
-        update_resource_amount(new_plants_amount, "Plants")
+            new_plants_amount = plants_amount + amount
+            update_resource_amount(new_plants_amount, "Plants")
 
-        print("Well done plants deal. ")
+            print("Well done plants deal. ")
     except ValueError:
 
         print(errors["only_integer"])
@@ -63,14 +71,17 @@ def buy_pesticides(pesticides):
         pesticides_price = get_resource_value("price", "Pesticides")
 
         new_money_amount = money_amount - amount * pesticides_price
-        update_resource_amount(new_money_amount, "Money")
+        if new_money_amount < 0:
+            print("There is not enough money to finish this operation.")
+        else:
+            update_resource_amount(new_money_amount, "Money")
 
-        pesticides_amount = get_resource_value("amount", "Pesticides")
+            pesticides_amount = get_resource_value("amount", "Pesticides")
 
-        new_pesticides_amount = pesticides_amount + amount
-        update_resource_amount(new_pesticides_amount, "Pesticides")
+            new_pesticides_amount = pesticides_amount + amount
+            update_resource_amount(new_pesticides_amount, "Pesticides")
 
-        print("Well done pesticides deal. ")
+            print("Well done pesticides deal. ")
     except ValueError:
 
         print(errors["only_integer"])
@@ -106,18 +117,23 @@ def buy_lands(lands):
                 f'SELECT price FROM lands WHERE class = "{chosen_class}";'
             ).fetchone()[0]
             new_money_amount = money_amount - lands_price
-            cur.execute(
-                f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-            )
-            last_id_number = cur.execute(
-                "SELECT id FROM lands WHERE ID = (SELECT max(ID) FROM lands)"
-            ).fetchone()[0]
-            new_id_number = last_id_number + 1
-            cur.execute(
-                f'UPDATE lands SET id = {new_id_number}  WHERE class = "{chosen_class}";'
-            )
+            if new_money_amount < 0:
+                cur.execute("DELETE FROM lands WHERE id = 0")
+                print("There is not enough money to finish this operation.")
+            else:
+                cur.execute(
+                    f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
+                )
+                last_id_number = cur.execute(
+                    "SELECT id FROM lands WHERE ID = (SELECT max(ID) FROM lands);"
+                ).fetchone()[0]
+                new_id_number = last_id_number + 1
+                cur.execute(
+                    f"UPDATE lands SET id = {new_id_number}  WHERE ID = (SELECT min(ID) FROM lands);"
+                )
 
-            print(f"Buying {chosen_class} is done properly ")
+                print(f"Buying {chosen_class} is done properly ")
+
         except KeyError:
             print("Invalid input")
 
@@ -183,7 +199,7 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
-    "second_choice": "What land do you choose to plant? Provide proper name of your land."
+    "second_choice": "What land do you choose to plant? Provide proper id of your land."
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
@@ -285,9 +301,15 @@ while True:
 
                 plants_in_resources = get_resource_value("amount", "Plants")
                 new_plants_in_resources = plants_in_resources - planting_amount
-                update_resource_amount(new_plants_in_resources, "Plants")
+                if new_plants_in_resources < 0:
+                    cur.execute(
+                        f'UPDATE lands SET plants = {plants_in_lands}  WHERE id = "{second_choice}";'
+                    )
+                    print("There is not enough plants to finish this operation.")
+                else:
+                    update_resource_amount(new_plants_in_resources, "Plants")
 
-                print(f"Well done planting in {second_choice}. ")
+                    print(f"Well done planting in id {second_choice} land. ")
 
         except ValueError:
             print(errors["only_integer"])
