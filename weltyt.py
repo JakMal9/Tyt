@@ -109,6 +109,13 @@ def buy_lands(lands):
             cur.execute(
                 f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
             )
+            last_id_number = cur.execute(
+                "SELECT id FROM lands WHERE ID = (SELECT max(ID) FROM lands)"
+            ).fetchone()[0]
+            new_id_number = last_id_number + 1
+            cur.execute(
+                f'UPDATE lands SET id = {new_id_number}  WHERE class = "{chosen_class}";'
+            )
 
             print(f"Buying {chosen_class} is done properly ")
         except KeyError:
@@ -118,35 +125,35 @@ def buy_lands(lands):
 lands_offert = {
     "humus": {
         "class": "humus",
-        "id": 1,
+        "id": 0,
         "growth_rate": 5,
         "price_ISL": 500,
         "plants": 0,
     },
     "humus_sag": {
         "class": "humus_sag",
-        "id": 2,
+        "id": 0,
         "growth_rate": 4,
         "price_ISL": 400,
         "plants": 0,
     },
     "brown_soil": {
         "class": "brown_soil",
-        "id": 3,
+        "id": 0,
         "growth_rate": 3,
         "price_ISL": 350,
         "plants": 0,
     },
     "lessive_soil": {
         "class": "lessive_soil",
-        "id": 4,
+        "id": 0,
         "growth_rate": 2,
         "price_ISL": 250,
         "plants": 0,
     },
     "clay_gravel": {
         "class": "clay_gravel",
-        "id": 5,
+        "id": 0,
         "growth_rate": 1,
         "price_ISL": 200,
         "plants": 0,
@@ -263,7 +270,7 @@ while True:
             planting_amount = int(planting_amount)
 
             plants_in_lands = cur.execute(
-                f'SELECT plants  FROM lands WHERE class = "{second_choice}";'
+                f'SELECT plants  FROM lands WHERE id = "{second_choice}";'
             ).fetchone()[0]
             new_plants_in_lands = plants_in_lands + planting_amount
 
@@ -273,7 +280,7 @@ while True:
             else:
 
                 cur.execute(
-                    f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE class = "{second_choice}";'
+                    f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
                 )
 
                 plants_in_resources = get_resource_value("amount", "Plants")
@@ -286,7 +293,7 @@ while True:
             print(errors["only_integer"])
 
         except TypeError:
-            print("Invalid land input, provide proper name.")
+            print("Invalid land input, provide id of your land, please.")
 
         second_choice = input(messages["second_choice"])
 
