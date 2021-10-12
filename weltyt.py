@@ -23,9 +23,14 @@ def get_resource_value(column, resource_type):
 
 
 def update_resource_amount(amount, resource_type):
+    # if amount > 0:
     cur.execute(
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
+
+
+# else:
+#     print("There is not enough resources to finish this operation.")
 
 
 def buy_plants(plants):
@@ -38,17 +43,20 @@ def buy_plants(plants):
         plants_price = get_resource_value("price", "Plants")
 
         new_money_amount = money_amount - amount * plants_price
-        update_resource_amount(new_money_amount, "Money")
+        if new_money_amount < 0:
+            print("There is not enough money to finish this operation.")
+        else:
+            update_resource_amount(new_money_amount, "Money")
 
-        plants_amount = get_resource_value("amount", "Plants")
+            plants_amount = get_resource_value("amount", "Plants")
 
-        new_plants_amount = plants_amount + amount
-        update_resource_amount(new_plants_amount, "Plants")
+            new_plants_amount = plants_amount + amount
+            update_resource_amount(new_plants_amount, "Plants")
 
-        print("Well done plants deal. ")
+            print("Well done plants deal. ")
     except ValueError:
 
-        print("Invalid input, provide integer only please. ")
+        print(errors["only_integer"])
 
 
 def buy_pesticides(pesticides):
@@ -63,17 +71,20 @@ def buy_pesticides(pesticides):
         pesticides_price = get_resource_value("price", "Pesticides")
 
         new_money_amount = money_amount - amount * pesticides_price
-        update_resource_amount(new_money_amount, "Money")
+        if new_money_amount < 0:
+            print("There is not enough money to finish this operation.")
+        else:
+            update_resource_amount(new_money_amount, "Money")
 
-        pesticides_amount = get_resource_value("amount", "Pesticides")
+            pesticides_amount = get_resource_value("amount", "Pesticides")
 
-        new_pesticides_amount = pesticides_amount + amount
-        update_resource_amount(new_pesticides_amount, "Pesticides")
+            new_pesticides_amount = pesticides_amount + amount
+            update_resource_amount(new_pesticides_amount, "Pesticides")
 
-        print("Well done pesticides deal. ")
+            print("Well done pesticides deal. ")
     except ValueError:
 
-        print("Invalid input, write integer only please. ")
+        print(errors["only_integer"])
 
 
 def buy_lands(lands):
@@ -106,11 +117,23 @@ def buy_lands(lands):
                 f'SELECT price FROM lands WHERE class = "{chosen_class}";'
             ).fetchone()[0]
             new_money_amount = money_amount - lands_price
-            cur.execute(
-                f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-            )
+            if new_money_amount < 0:
+                cur.execute("DELETE FROM lands WHERE id = 0")
+                print("There is not enough money to finish this operation.")
+            else:
+                cur.execute(
+                    f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
+                )
+                last_id_number = cur.execute(
+                    "SELECT id FROM lands WHERE ID = (SELECT max(ID) FROM lands);"
+                ).fetchone()[0]
+                new_id_number = last_id_number + 1
+                cur.execute(
+                    f"UPDATE lands SET id = {new_id_number}  WHERE ID = (SELECT min(ID) FROM lands);"
+                )
 
-            print(f"Buying {chosen_class} is done properly ")
+                print(f"Buying {chosen_class} is done properly ")
+
         except KeyError:
             print("Invalid input")
 
@@ -118,35 +141,35 @@ def buy_lands(lands):
 lands_offert = {
     "humus": {
         "class": "humus",
-        "id": 1,
+        "id": 0,
         "growth_rate": 5,
         "price_ISL": 500,
         "plants": 0,
     },
     "humus_sag": {
         "class": "humus_sag",
-        "id": 2,
+        "id": 0,
         "growth_rate": 4,
         "price_ISL": 400,
         "plants": 0,
     },
     "brown_soil": {
         "class": "brown_soil",
-        "id": 3,
+        "id": 0,
         "growth_rate": 3,
         "price_ISL": 350,
         "plants": 0,
     },
     "lessive_soil": {
         "class": "lessive_soil",
-        "id": 4,
+        "id": 0,
         "growth_rate": 2,
         "price_ISL": 250,
         "plants": 0,
     },
     "clay_gravel": {
         "class": "clay_gravel",
-        "id": 5,
+        "id": 0,
         "growth_rate": 1,
         "price_ISL": 200,
         "plants": 0,
@@ -176,7 +199,11 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
+    "second_choice": "What land do you choose to plant? Provide proper id of your land."
+    'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
+
+errors = {"only_integer": "Invalid input, write integer only please. "}
 
 print(explanation.keys())
 
@@ -192,51 +219,123 @@ initializationDB(cur)
 
 conn.commit()
 
-first_choice = input(messages["first_choice"])
-
-
+turn_counting = 0
 while True:
+    turn_counting = turn_counting + 1
+    print(f"Next turn number {turn_counting}")
 
+    first_choice = input(messages["first_choice"])
 
-    if first_choice == commands["show_my_resources"]:
-        show_my_resources(first_choice)
-        first_choice = input(messages["first_choice"])
+    while True:
 
-    elif first_choice == commands["buy"]:
-        user_choice = input(messages["user_choice"])
-
-        if user_choice == commands["plants"]:
-            buy_plants(user_choice)
+        if first_choice == commands["show_my_resources"]:
+            show_my_resources(first_choice)
             first_choice = input(messages["first_choice"])
 
-        elif user_choice == commands["lands"]:
-            buy_lands(user_choice)
-            first_choice = input(messages["first_choice"])
-
-        elif user_choice == commands["pesticides"]:
-            buy_pesticides(user_choice)
-            first_choice = input(messages["first_choice"])
-
-        elif user_choice == commands["help"]:
-            print(explanation)
+        elif first_choice == commands["buy"]:
             user_choice = input(messages["user_choice"])
+
+            if user_choice == commands["plants"]:
+                buy_plants(user_choice)
+                first_choice = input(messages["first_choice"])
+
+            elif user_choice == commands["lands"]:
+                buy_lands(user_choice)
+                first_choice = input(messages["first_choice"])
+
+            elif user_choice == commands["pesticides"]:
+                buy_pesticides(user_choice)
+                first_choice = input(messages["first_choice"])
+
+            elif user_choice == commands["help"]:
+                print(explanation)
+                user_choice = input(messages["user_choice"])
+
+            else:
+                print("Invalid input")
+                first_choice = input(messages["first_choice"])
+
+        elif first_choice == commands["help"]:
+            print(explanation)
+            first_choice = input(messages["first_choice"])
+
+        elif first_choice == "no":
+            print("Shopping is finished ")
+            break
 
         else:
             print("Invalid input")
             first_choice = input(messages["first_choice"])
 
-    elif first_choice == commands["help"]:
-        print(explanation)
-        first_choice = input(messages["first_choice"])
+    print("Go forward")
 
-    elif first_choice == "no":
-        print("Shopping is finished ")
+    second_choice = input(messages["second_choice"])
+
+    while True:
+
+        if second_choice == "no":
+            break
+            print("Planting in finished.")
+
+        elif second_choice == commands["show_my_resources"]:
+            show_my_resources(second_choice)
+            second_choice = input(messages["second_choice"])
+
+        else:
+
+            try:
+                planting_amount = input(
+                    "How many plants do you want to plant in your land?       "
+                )
+                planting_amount = int(planting_amount)
+
+                plants_in_lands = cur.execute(
+                    f'SELECT plants  FROM lands WHERE id = "{second_choice}";'
+                ).fetchone()[0]
+                new_plants_in_lands = plants_in_lands + planting_amount
+
+                if new_plants_in_lands > 100:
+                    print("On one land you can plant only 100 plants")
+
+                else:
+
+                    cur.execute(
+                        f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
+                    )
+
+                    plants_in_resources = get_resource_value("amount", "Plants")
+                    new_plants_in_resources = plants_in_resources - planting_amount
+                    if new_plants_in_resources < 0:
+                        cur.execute(
+                            f'UPDATE lands SET plants = {plants_in_lands}  WHERE id = "{second_choice}";'
+                        )
+                        print("There is not enough plants to finish this operation.")
+                    else:
+                        update_resource_amount(new_plants_in_resources, "Plants")
+
+                        print(f"Well done planting in id {second_choice} land. ")
+
+            except ValueError:
+                print(errors["only_integer"])
+
+            except TypeError:
+                print("Invalid land input, provide id of your land, please.")
+
+            second_choice = input(messages["second_choice"])
+
+    print("Go forward")
+
+    get_out_of_game = input(
+        'To get out of this game write "Go out", to go to next round write whatever. '
+    )
+    if get_resource_value("amount", "Money") > 10000:
+        break
+        print(f"You achieved success after {turn_counting} turns, game over!")
+    elif get_out_of_game == "Go out":
+        print(f"You did not achieve success after {turn_counting} turns.")
         break
 
     else:
-        print("Invalid input")
-        first_choice = input(messages["first_choice"])
-
-print("Go forward")
+        print("This turn is finished.")
 
 conn.close()
