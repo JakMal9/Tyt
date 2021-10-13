@@ -8,7 +8,7 @@ def initializationDB(cursor):
             cursor.execute(line)
 
 
-def show_my_resources(x):
+def show_my_resources():
     for row in cur.execute("SELECT * FROM resources"):
         print(row)
 
@@ -188,7 +188,7 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
-    "second_choice": "What land do you choose to plant? Provide proper id of your land."
+    "second_choice": "What land do you choose to plant? Provide proper name of your land."
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
@@ -214,7 +214,7 @@ first_choice = input(messages["first_choice"])
 while True:
 
     if first_choice == commands["show_my_resources"]:
-        show_my_resources(first_choice)
+        show_my_resources()
         first_choice = input(messages["first_choice"])
 
     elif first_choice == commands["buy"]:
@@ -263,7 +263,7 @@ while True:
         print("Planting in finished.")
 
     elif second_choice == commands["show_my_resources"]:
-        show_my_resources(second_choice)
+        show_my_resources()
         second_choice = input(messages["second_choice"])
 
     else:
@@ -290,6 +290,7 @@ while True:
 
                 plants_in_resources = get_resource_value("amount", "Plants")
                 new_plants_in_resources = plants_in_resources - planting_amount
+
                 if new_plants_in_resources < 0:
                     cur.execute(
                         f'UPDATE lands SET plants = {plants_in_lands}  WHERE id = "{second_choice}";'
