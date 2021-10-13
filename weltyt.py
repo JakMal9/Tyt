@@ -8,7 +8,7 @@ def initializationDB(cursor):
             cursor.execute(line)
 
 
-def show_my_resources(x):
+def show_my_resources():
     for row in cur.execute("SELECT * FROM resources"):
         print(row)
 
@@ -48,7 +48,7 @@ def buy_plants(plants):
         print("Well done plants deal. ")
     except ValueError:
 
-        print("Invalid input, provide integer only please. ")
+        print(errors["only_integer"])
 
 
 def buy_pesticides(pesticides):
@@ -73,7 +73,7 @@ def buy_pesticides(pesticides):
         print("Well done pesticides deal. ")
     except ValueError:
 
-        print("Invalid input, write integer only please. ")
+        print(errors["only_integer"])
 
 
 def buy_lands(lands):
@@ -97,7 +97,7 @@ def buy_lands(lands):
         try:
 
             add_land = cur.execute(
-                f'INSERT INTO lands VALUES ("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["id"]}, {lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, {lands_offert[chosen_class]["plants"]});'
+                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, {lands_offert[chosen_class]["plants"]});'
             )
             money_amount = cur.execute(
                 'SELECT amount  FROM resources WHERE type = "Money";'
@@ -176,7 +176,11 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
+    "second_choice": "What land do you choose to plant? Provide proper name of your land."
+    'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
+
+errors = {"only_integer": "Invalid input, write integer only please. "}
 
 print(explanation.keys())
 
@@ -197,9 +201,8 @@ first_choice = input(messages["first_choice"])
 
 while True:
 
-
     if first_choice == commands["show_my_resources"]:
-        show_my_resources(first_choice)
+        show_my_resources()
         first_choice = input(messages["first_choice"])
 
     elif first_choice == commands["buy"]:
@@ -236,6 +239,57 @@ while True:
     else:
         print("Invalid input")
         first_choice = input(messages["first_choice"])
+
+print("Go forward")
+
+second_choice = input(messages["second_choice"])
+
+while True:
+
+    if second_choice == "no":
+        break
+        print("Planting in finished.")
+
+    elif second_choice == commands["show_my_resources"]:
+        show_my_resources()
+        second_choice = input(messages["second_choice"])
+
+    else:
+
+        try:
+            planting_amount = input(
+                "How many plants do you want to plant in your land?       "
+            )
+            planting_amount = int(planting_amount)
+
+            plants_in_lands = cur.execute(
+                f'SELECT plants  FROM lands WHERE id = "{second_choice}";'
+            ).fetchone()[0]
+            new_plants_in_lands = plants_in_lands + planting_amount
+
+            if new_plants_in_lands > 100:
+                print("On one land you can plant only 100 plants")
+
+            else:
+
+                cur.execute(
+                    f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
+                )
+
+                plants_in_resources = get_resource_value("amount", "Plants")
+                new_plants_in_resources = plants_in_resources - planting_amount
+                update_resource_amount(new_plants_in_resources, "Plants")
+
+                print(f"Well done planting in {second_choice}. ")
+
+        except ValueError:
+            print(errors["only_integer"])
+
+        except TypeError:
+            print("Invalid land input, provide id of your land, please.")
+
+        second_choice = input(messages["second_choice"])
+
 
 print("Go forward")
 
