@@ -23,6 +23,7 @@ def get_resource_value(column, resource_type):
 
 
 def update_resource_amount(amount, resource_type):
+
     cur.execute(
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
@@ -40,15 +41,17 @@ def buy_plants(plants):
         new_money_amount = money_amount - amount * plants_price
         if new_money_amount < 0:
             print(errors["not_enough_money"])
-        else:
-            update_resource_amount(new_money_amount, "Money")
+            return
 
-            plants_amount = get_resource_value("amount", "Plants")
+        update_resource_amount(new_money_amount, "Money")
 
-            new_plants_amount = plants_amount + amount
-            update_resource_amount(new_plants_amount, "Plants")
+        plants_amount = get_resource_value("amount", "Plants")
 
-            print("Well done plants deal. ")
+        new_plants_amount = plants_amount + amount
+        update_resource_amount(new_plants_amount, "Plants")
+
+        print("Well done plants deal. ")
+
     except ValueError:
 
         print(errors["only_integer"])
@@ -68,15 +71,16 @@ def buy_pesticides(pesticides):
         new_money_amount = money_amount - amount * pesticides_price
         if new_money_amount < 0:
             print(errors["not_enough_money"])
-        else:
-            update_resource_amount(new_money_amount, "Money")
+            return
 
-            pesticides_amount = get_resource_value("amount", "Pesticides")
+        update_resource_amount(new_money_amount, "Money")
 
-            new_pesticides_amount = pesticides_amount + amount
-            update_resource_amount(new_pesticides_amount, "Pesticides")
+        pesticides_amount = get_resource_value("amount", "Pesticides")
 
-            print("Well done pesticides deal. ")
+        new_pesticides_amount = pesticides_amount + amount
+        update_resource_amount(new_pesticides_amount, "Pesticides")
+
+        print("Well done pesticides deal. ")
 
     except ValueError:
         print(errors["only_integer"])
@@ -101,26 +105,28 @@ def buy_lands(lands):
         )
 
         try:
-
-            add_land = cur.execute(
-                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, {lands_offert[chosen_class]["plants"]});'
-            )
             money_amount = cur.execute(
                 'SELECT amount  FROM resources WHERE type = "Money";'
             ).fetchone()[0]
-            lands_price = cur.execute(
-                f'SELECT price FROM lands WHERE class = "{chosen_class}";'
-            ).fetchone()[0]
-            new_money_amount = money_amount - lands_price
-            if new_money_amount < 0:
-                cur.execute("DELETE FROM lands WHERE id = (SELECT max(id) FROM lands)")
-                print(errors["not_enough_money"])
-            else:
-                cur.execute(
-                    f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-                )
 
-                print(f"Buying {chosen_class} is done properly ")
+            lands_price = lands_offert[chosen_class]["price_ISL"]
+
+            new_money_amount = money_amount - lands_price
+
+            if new_money_amount < 0:
+                print(errors["not_enough_money"])
+                return
+
+            cur.execute(
+                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}",'
+                f'{lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, '
+                f'{lands_offert[chosen_class]["plants"]});'
+            )
+            cur.execute(
+                f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
+            )
+
+            print(f"Buying {chosen_class} is done properly ")
 
         except KeyError:
             print("Invalid input")
@@ -191,8 +197,10 @@ messages = {
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
-errors = {"only_integer": "Invalid input, write integer only please. ", "not_enough_money": 
-    "There is not enough money to finish this operation."}
+errors = {
+    "only_integer": "Invalid input, write integer only please. ",
+    "not_enough_money": "There is not enough money to finish this operation.",
+}
 
 print(explanation.keys())
 
