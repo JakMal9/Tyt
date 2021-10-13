@@ -23,6 +23,7 @@ def get_resource_value(column, resource_type):
 
 
 def update_resource_amount(amount, resource_type):
+
     cur.execute(
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
@@ -38,6 +39,9 @@ def buy_plants(plants):
         plants_price = get_resource_value("price", "Plants")
 
         new_money_amount = money_amount - amount * plants_price
+        if new_money_amount < 0:
+            print(errors["not_enough_money"])
+            return
         update_resource_amount(new_money_amount, "Money")
 
         plants_amount = get_resource_value("amount", "Plants")
@@ -63,6 +67,9 @@ def buy_pesticides(pesticides):
         pesticides_price = get_resource_value("price", "Pesticides")
 
         new_money_amount = money_amount - amount * pesticides_price
+        if new_money_amount < 0:
+            print(errors["not_enough_money"])
+            return
         update_resource_amount(new_money_amount, "Money")
 
         pesticides_amount = get_resource_value("amount", "Pesticides")
@@ -71,8 +78,8 @@ def buy_pesticides(pesticides):
         update_resource_amount(new_pesticides_amount, "Pesticides")
 
         print("Well done pesticides deal. ")
-    except ValueError:
 
+    except ValueError:
         print(errors["only_integer"])
 
 
@@ -95,22 +102,29 @@ def buy_lands(lands):
         )
 
         try:
-
-            add_land = cur.execute(
-                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, {lands_offert[chosen_class]["plants"]});'
-            )
             money_amount = cur.execute(
                 'SELECT amount  FROM resources WHERE type = "Money";'
             ).fetchone()[0]
-            lands_price = cur.execute(
-                f'SELECT price FROM lands WHERE class = "{chosen_class}";'
-            ).fetchone()[0]
+
+            lands_price = lands_offert[chosen_class]["price_ISL"]
+
             new_money_amount = money_amount - lands_price
+
+            if new_money_amount < 0:
+                print(errors["not_enough_money"])
+                return
+            
+            cur.execute(
+                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}",'
+                f'{lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, '
+                f'{lands_offert[chosen_class]["plants"]});'
+            )
             cur.execute(
                 f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
             )
 
             print(f"Buying {chosen_class} is done properly ")
+
         except KeyError:
             print("Invalid input")
 
@@ -180,7 +194,10 @@ messages = {
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
-errors = {"only_integer": "Invalid input, write integer only please. "}
+errors = {
+    "only_integer": "Invalid input, write integer only please. ",
+    "not_enough_money": "There is not enough money to finish this operation.",
+}
 
 print(explanation.keys())
 
@@ -278,9 +295,16 @@ while True:
 
                 plants_in_resources = get_resource_value("amount", "Plants")
                 new_plants_in_resources = plants_in_resources - planting_amount
-                update_resource_amount(new_plants_in_resources, "Plants")
 
-                print(f"Well done planting in {second_choice}. ")
+                if new_plants_in_resources < 0:
+                    cur.execute(
+                        f'UPDATE lands SET plants = {plants_in_lands}  WHERE id = "{second_choice}";'
+                    )
+                    print("There is not enough plants to finish this operation.")
+                else:
+                    update_resource_amount(new_plants_in_resources, "Plants")
+
+                    print(f"Well done planting in id {second_choice} land. ")
 
         except ValueError:
             print(errors["only_integer"])
