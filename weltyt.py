@@ -8,7 +8,7 @@ def initializationDB(cursor):
             cursor.execute(line)
 
 
-def show_my_resources(x):
+def show_my_resources():
     for row in cur.execute("SELECT * FROM resources"):
         print(row)
 
@@ -39,7 +39,7 @@ def buy_plants(plants):
 
         new_money_amount = money_amount - amount * plants_price
         if new_money_amount < 0:
-            print("There is not enough money to finish this operation.")
+            print(errors["not_enough_money"])
         else:
             update_resource_amount(new_money_amount, "Money")
 
@@ -67,7 +67,7 @@ def buy_pesticides(pesticides):
 
         new_money_amount = money_amount - amount * pesticides_price
         if new_money_amount < 0:
-            print("There is not enough money to finish this operation.")
+            print(errors["not_enough_money"])
         else:
             update_resource_amount(new_money_amount, "Money")
 
@@ -77,8 +77,8 @@ def buy_pesticides(pesticides):
             update_resource_amount(new_pesticides_amount, "Pesticides")
 
             print("Well done pesticides deal. ")
-    except ValueError:
 
+    except ValueError:
         print(errors["only_integer"])
 
 
@@ -114,7 +114,7 @@ def buy_lands(lands):
             new_money_amount = money_amount - lands_price
             if new_money_amount < 0:
                 cur.execute("DELETE FROM lands WHERE id = (SELECT max(id) FROM lands)")
-                print("There is not enough money to finish this operation.")
+                print(errors["not_enough_money"])
             else:
                 cur.execute(
                     f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
@@ -187,11 +187,12 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
-    "second_choice": "What land do you choose to plant? Provide proper id of your land."
+    "second_choice": "What land do you choose to plant? Provide proper name of your land."
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
-errors = {"only_integer": "Invalid input, write integer only please. "}
+errors = {"only_integer": "Invalid input, write integer only please. ", "not_enough_money": 
+    "There is not enough money to finish this operation."}
 
 print(explanation.keys())
 
@@ -217,7 +218,7 @@ while True:
     while True:
 
         if first_choice == commands["show_my_resources"]:
-            show_my_resources(first_choice)
+            show_my_resources()
             first_choice = input(messages["first_choice"])
 
         elif first_choice == commands["buy"]:
@@ -266,7 +267,7 @@ while True:
             print("Planting in finished.")
 
         elif second_choice == commands["show_my_resources"]:
-            show_my_resources(second_choice)
+            show_my_resources()
             second_choice = input(messages["second_choice"])
 
         else:
