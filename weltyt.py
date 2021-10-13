@@ -218,7 +218,7 @@ conn.commit()
 
 turn_counting = 0
 while True:
-    turn_counting = turn_counting + 1
+    turn_counting += 1
     print(f"Next turn number {turn_counting}")
 
     first_choice = input(messages["first_choice"])
