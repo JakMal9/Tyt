@@ -8,7 +8,7 @@ def initializationDB(cursor):
             cursor.execute(line)
 
 
-def show_my_resources(x):
+def show_my_resources():
     for row in cur.execute("SELECT * FROM resources"):
         print(row)
 
@@ -202,7 +202,7 @@ first_choice = input(messages["first_choice"])
 while True:
 
     if first_choice == commands["show_my_resources"]:
-        show_my_resources(first_choice)
+        show_my_resources()
         first_choice = input(messages["first_choice"])
 
     elif first_choice == commands["buy"]:
@@ -251,7 +251,7 @@ while True:
         print("Planting in finished.")
 
     elif second_choice == commands["show_my_resources"]:
-        show_my_resources(second_choice)
+        show_my_resources()
         second_choice = input(messages["second_choice"])
 
     else:
