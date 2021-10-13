@@ -41,15 +41,15 @@ def buy_plants(plants):
         new_money_amount = money_amount - amount * plants_price
         if new_money_amount < 0:
             print(errors["not_enough_money"])
-        else:
-            update_resource_amount(new_money_amount, "Money")
+            return
+        update_resource_amount(new_money_amount, "Money")
 
-            plants_amount = get_resource_value("amount", "Plants")
+        plants_amount = get_resource_value("amount", "Plants")
 
-            new_plants_amount = plants_amount + amount
-            update_resource_amount(new_plants_amount, "Plants")
+        new_plants_amount = plants_amount + amount
+        update_resource_amount(new_plants_amount, "Plants")
 
-            print("Well done plants deal. ")
+        print("Well done plants deal. ")
     except ValueError:
 
         print(errors["only_integer"])
@@ -69,15 +69,15 @@ def buy_pesticides(pesticides):
         new_money_amount = money_amount - amount * pesticides_price
         if new_money_amount < 0:
             print(errors["not_enough_money"])
-        else:
-            update_resource_amount(new_money_amount, "Money")
+            return
+        update_resource_amount(new_money_amount, "Money")
 
-            pesticides_amount = get_resource_value("amount", "Pesticides")
+        pesticides_amount = get_resource_value("amount", "Pesticides")
 
-            new_pesticides_amount = pesticides_amount + amount
-            update_resource_amount(new_pesticides_amount, "Pesticides")
+        new_pesticides_amount = pesticides_amount + amount
+        update_resource_amount(new_pesticides_amount, "Pesticides")
 
-            print("Well done pesticides deal. ")
+        print("Well done pesticides deal. ")
 
     except ValueError:
         print(errors["only_integer"])
@@ -112,18 +112,18 @@ def buy_lands(lands):
 
             if new_money_amount < 0:
                 print(errors["not_enough_money"])
+                return
+            
+            cur.execute(
+                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}",'
+                f'{lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, '
+                f'{lands_offert[chosen_class]["plants"]});'
+            )
+            cur.execute(
+                f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
+            )
 
-            else:
-                cur.execute(
-                    f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}",'
-                    f'{lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, '
-                    f'{lands_offert[chosen_class]["plants"]});'
-                )
-                cur.execute(
-                    f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
-                )
-
-                print(f"Buying {chosen_class} is done properly ")
+            print(f"Buying {chosen_class} is done properly ")
 
         except KeyError:
             print("Invalid input")
