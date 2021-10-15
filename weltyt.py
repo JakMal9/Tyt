@@ -28,6 +28,15 @@ def update_resource_amount(amount, resource_type):
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
 
+def get_lands_value(column, land_id):
+    return cur.execute(
+        f'SELECT "{column}" FROM lands WHERE id = "{land_id}"'
+    ).fetchone()[0]
+
+def update_lands_plants(new_plants_in_lands, land_id):
+    cur.execute(
+        f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
+    )
 
 def buy_plants(plants):
     amount = input("How many plants do you want to buy? Provide only integer please. ")
@@ -130,7 +139,6 @@ def buy_lands(lands):
 
         except KeyError:
             print("Invalid input")
-
 
 lands_offert = {
     "humus": {
@@ -287,9 +295,8 @@ while True:
         else:
 
             try:
-                plants_on_land = cur.execute(
-                    f'SELECT plants FROM lands WHERE id = "{second_choice}"'
-                ).fetchone()[0]
+                plants_on_land = get_lands_value("plants", second_choice)
+                
 
                 if plants_on_land > 0:
                     print(
@@ -302,26 +309,21 @@ while True:
                     )
                     planting_amount = int(planting_amount)
 
-                    plants_in_lands = cur.execute(
-                        f'SELECT plants  FROM lands WHERE id = "{second_choice}";'
-                    ).fetchone()[0]
+                    plants_in_lands = get_lands_value("plants", second_choice)
+
                     new_plants_in_lands = plants_in_lands + planting_amount
 
                     if new_plants_in_lands > 100:
                         print("On one land you can plant only 100 plants")
 
                     else:
-
-                        cur.execute(
-                            f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
-                        )
+                        update_lands_plants(new_plants_in_lands, second_choice)
 
                         plants_in_resources = get_resource_value("amount", "Plants")
                         new_plants_in_resources = plants_in_resources - planting_amount
                         if new_plants_in_resources < 0:
-                            cur.execute(
-                                f'UPDATE lands SET plants = {plants_in_lands}  WHERE id = "{second_choice}";'
-                            )
+                            update_lands_plants(plants_in_lands, second_choice)
+                            
                             print(
                                 "There is not enough plants to finish this operation."
                             )
@@ -350,16 +352,13 @@ while True:
             f'UPDATE lands SET growth_percentage = {growing}  WHERE id = "{g[1]}";'
         )
 
-    show_my_resources()
-
     harvest = []
     for grown in cur.execute("SELECT * FROM lands WHERE growth_percentage>100"):
         harvest.append(grown)
 
-    for h in harvest:
-        cur.execute(
-            f'UPDATE resources SET amount = (SELECT amount FROM resources WHERE type = "Tobbaco_good") + (SELECT plants FROM lands WHERE id = "{h[1]}") WHERE type = "Tobbaco_good"'
-        )
+    for h in harvest: 
+        update_resource_amount(get_resource_value("amount", "Tobbaco_good") + get_lands_value("plants", h[1]), "Tobbaco_good")
+
         cur.execute(
             f'UPDATE lands SET growth_percentage = 0, plants = 0  WHERE id = "{h[1]}";'
         )
