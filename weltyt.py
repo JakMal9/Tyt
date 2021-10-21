@@ -130,9 +130,9 @@ def buy_lands(lands):
                 return
 
             cur.execute(
-                f'INSERT INTO lands (class, growth_rate, price, plants, growth_percentage) VALUES ("{lands_offert[chosen_class]["class"]}",'
-                f'{lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, '
-                f'{lands_offert[chosen_class]["plants"]}, {lands_offert[chosen_class]["growth_percentage"]});'
+                f"INSERT INTO lands (class, growth_rate, price, plants, growth_percentage) VALUES "
+                f'("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["growth_rate"]},'
+                f' {lands_offert[chosen_class]["price_ISL"]}, 0, 0);'
             )
             cur.execute(
                 f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
@@ -150,40 +150,30 @@ lands_offert = {
         "id": 1,
         "growth_rate": 5,
         "price_ISL": 500,
-        "plants": 0,
-        "growth_percentage": 0,
     },
     "humus_sag": {
         "class": "humus_sag",
         "id": 2,
         "growth_rate": 4,
         "price_ISL": 400,
-        "plants": 0,
-        "growth_percentage": 0,
     },
     "brown_soil": {
         "class": "brown_soil",
         "id": 3,
         "growth_rate": 3,
         "price_ISL": 350,
-        "plants": 0,
-        "growth_percentage": 0,
     },
     "lessive_soil": {
         "class": "lessive_soil",
         "id": 4,
         "growth_rate": 2,
         "price_ISL": 250,
-        "plants": 0,
-        "growth_percentage": 0,
     },
     "clay_gravel": {
         "class": "clay_gravel",
         "id": 5,
         "growth_rate": 1,
         "price_ISL": 200,
-        "plants": 0,
-        "growth_percentage": 0,
     },
 }
 
