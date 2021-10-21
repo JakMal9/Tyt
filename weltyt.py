@@ -28,15 +28,18 @@ def update_resource_amount(amount, resource_type):
         f'UPDATE resources SET amount = {amount}  WHERE type = "{resource_type}";'
     )
 
+
 def get_lands_value(column, land_id):
     return cur.execute(
         f'SELECT "{column}" FROM lands WHERE id = "{land_id}"'
     ).fetchone()[0]
 
+
 def update_lands_plants(new_plants_in_lands, land_id):
     cur.execute(
         f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
     )
+
 
 def buy_plants(plants):
     amount = input("How many plants do you want to buy? Provide only integer please. ")
@@ -139,6 +142,7 @@ def buy_lands(lands):
 
         except KeyError:
             print("Invalid input")
+
 
 lands_offert = {
     "humus": {
@@ -296,7 +300,6 @@ while True:
 
             try:
                 plants_on_land = get_lands_value("plants", second_choice)
-                
 
                 if plants_on_land > 0:
                     print(
@@ -323,7 +326,7 @@ while True:
                         new_plants_in_resources = plants_in_resources - planting_amount
                         if new_plants_in_resources < 0:
                             update_lands_plants(plants_in_lands, second_choice)
-                            
+
                             print(
                                 "There is not enough plants to finish this operation."
                             )
@@ -342,9 +345,7 @@ while True:
 
     print("Go forward")
 
-    planted_lands = []
-    for p in cur.execute("SELECT * FROM lands WHERE plants>0"):
-        planted_lands.append(p)
+    planted_lands = [p for p in cur.execute("SELECT * FROM lands WHERE plants>0")]
 
     for g in planted_lands:
         growing = g[5] + g[2] + 4
@@ -352,12 +353,17 @@ while True:
             f'UPDATE lands SET growth_percentage = {growing}  WHERE id = "{g[1]}";'
         )
 
-    harvest = []
-    for grown in cur.execute("SELECT * FROM lands WHERE growth_percentage>100"):
-        harvest.append(grown)
+    harvest = [
+        grown
+        for grown in cur.execute("SELECT * FROM lands WHERE growth_percentage>100")
+    ]
 
-    for h in harvest: 
-        update_resource_amount(get_resource_value("amount", "Tobbaco_good") + get_lands_value("plants", h[1]), "Tobbaco_good")
+    for h in harvest:
+        update_resource_amount(
+            get_resource_value("amount", "Tobbaco_good")
+            + get_lands_value("plants", h[1]),
+            "Tobbaco_good",
+        )
 
         cur.execute(
             f'UPDATE lands SET growth_percentage = 0, plants = 0  WHERE id = "{h[1]}";'
