@@ -29,6 +29,18 @@ def update_resource_amount(amount, resource_type):
     )
 
 
+def get_lands_value(column, land_id):
+    return cur.execute(
+        f'SELECT "{column}" FROM lands WHERE id = "{land_id}"'
+    ).fetchone()[0]
+
+
+def update_lands_plants(new_plants_in_lands, land_id):
+    cur.execute(
+        f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
+    )
+
+
 def buy_plants(plants):
     amount = input("How many plants do you want to buy? Provide only integer please. ")
 
@@ -118,9 +130,9 @@ def buy_lands(lands):
                 return
 
             cur.execute(
-                f'INSERT INTO lands (class, growth_rate, price, plants) VALUES ("{lands_offert[chosen_class]["class"]}",'
-                f'{lands_offert[chosen_class]["growth_rate"]}, {lands_offert[chosen_class]["price_ISL"]}, '
-                f'{lands_offert[chosen_class]["plants"]});'
+                f"INSERT INTO lands (class, growth_rate, price, plants, growth_percentage) VALUES "
+                f'("{lands_offert[chosen_class]["class"]}", {lands_offert[chosen_class]["growth_rate"]},'
+                f' {lands_offert[chosen_class]["price_ISL"]}, 0, 0);'
             )
             cur.execute(
                 f'UPDATE resources SET amount = {new_money_amount}  WHERE type = "Money";'
@@ -138,35 +150,30 @@ lands_offert = {
         "id": 1,
         "growth_rate": 5,
         "price_ISL": 500,
-        "plants": 0,
     },
     "humus_sag": {
         "class": "humus_sag",
         "id": 2,
         "growth_rate": 4,
         "price_ISL": 400,
-        "plants": 0,
     },
     "brown_soil": {
         "class": "brown_soil",
         "id": 3,
         "growth_rate": 3,
         "price_ISL": 350,
-        "plants": 0,
     },
     "lessive_soil": {
         "class": "lessive_soil",
         "id": 4,
         "growth_rate": 2,
         "price_ISL": 250,
-        "plants": 0,
     },
     "clay_gravel": {
         "class": "clay_gravel",
         "id": 5,
         "growth_rate": 1,
         "price_ISL": 200,
-        "plants": 0,
     },
 }
 
@@ -193,7 +200,7 @@ messages = {
     " please.\n",
     "user_choice": 'To start grow tobbaco you need plants and lands. To buy plants write just "Plants", '
     'to buy lands write "Lands", to buy pesticides write "Pesticides" please.\n',
-    "second_choice": "What land do you choose to plant? Provide proper name of your land."
+    "second_choice": "What land do you choose to plant? Provide proper id of your land."
     'To check your resources write "show_my_resources" To avoid this step, write "no" please.\n',
 }
 
@@ -217,6 +224,7 @@ initializationDB(cur)
 conn.commit()
 
 turn_counting = 0
+growing = 0
 while True:
     turn_counting += 1
     print(f"Next turn number {turn_counting}")
@@ -272,7 +280,7 @@ while True:
 
         if second_choice == "no":
             break
-            print("Planting in finished.")
+            print("Planting is finished.")
 
         elif second_choice == commands["show_my_resources"]:
             show_my_resources()
@@ -281,36 +289,41 @@ while True:
         else:
 
             try:
-                planting_amount = input(
-                    "How many plants do you want to plant in your land?       "
-                )
-                planting_amount = int(planting_amount)
+                plants_on_land = get_lands_value("plants", second_choice)
 
-                plants_in_lands = cur.execute(
-                    f'SELECT plants  FROM lands WHERE id = "{second_choice}";'
-                ).fetchone()[0]
-                new_plants_in_lands = plants_in_lands + planting_amount
-
-                if new_plants_in_lands > 100:
-                    print("On one land you can plant only 100 plants")
-
-                else:
-
-                    cur.execute(
-                        f'UPDATE lands SET plants = {new_plants_in_lands}  WHERE id = "{second_choice}";'
+                if plants_on_land > 0:
+                    print(
+                        "You can plant only on empty land, choose another one please."
                     )
 
-                    plants_in_resources = get_resource_value("amount", "Plants")
-                    new_plants_in_resources = plants_in_resources - planting_amount
-                    if new_plants_in_resources < 0:
-                        cur.execute(
-                            f'UPDATE lands SET plants = {plants_in_lands}  WHERE id = "{second_choice}";'
-                        )
-                        print("There is not enough plants to finish this operation.")
-                    else:
-                        update_resource_amount(new_plants_in_resources, "Plants")
+                else:
+                    planting_amount = input(
+                        "How many plants do you want to plant in your land?       "
+                    )
+                    planting_amount = int(planting_amount)
 
-                        print(f"Well done planting in id {second_choice} land. ")
+                    plants_in_lands = get_lands_value("plants", second_choice)
+
+                    new_plants_in_lands = plants_in_lands + planting_amount
+
+                    if new_plants_in_lands > 100:
+                        print("On one land you can plant only 100 plants")
+
+                    else:
+                        update_lands_plants(new_plants_in_lands, second_choice)
+
+                        plants_in_resources = get_resource_value("amount", "Plants")
+                        new_plants_in_resources = plants_in_resources - planting_amount
+                        if new_plants_in_resources < 0:
+                            update_lands_plants(plants_in_lands, second_choice)
+
+                            print(
+                                "There is not enough plants to finish this operation."
+                            )
+                        else:
+                            update_resource_amount(new_plants_in_resources, "Plants")
+
+                            print(f"Well done planting in id {second_choice} land. ")
 
             except ValueError:
                 print(errors["only_integer"])
@@ -321,6 +334,30 @@ while True:
             second_choice = input(messages["second_choice"])
 
     print("Go forward")
+
+    planted_lands = [p for p in cur.execute("SELECT * FROM lands WHERE plants>0")]
+
+    for g in planted_lands:
+        growing = g[5] + g[2] + 4
+        cur.execute(
+            f'UPDATE lands SET growth_percentage = {growing}  WHERE id = "{g[1]}";'
+        )
+
+    harvest = [
+        grown
+        for grown in cur.execute("SELECT * FROM lands WHERE growth_percentage>100")
+    ]
+
+    for h in harvest:
+        update_resource_amount(
+            get_resource_value("amount", "Tobbaco_good")
+            + get_lands_value("plants", h[1]),
+            "Tobbaco_good",
+        )
+
+        cur.execute(
+            f'UPDATE lands SET growth_percentage = 0, plants = 0  WHERE id = "{h[1]}";'
+        )
 
     get_out_of_game = input(
         'To get out of this game write "Go out", to go to next round write whatever. '

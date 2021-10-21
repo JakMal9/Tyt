@@ -7,4 +7,4 @@ INSERT INTO resources VALUES ('Plants', 0, 'pieces', 1);
 INSERT INTO resources VALUES ('Company_name', 1, 'input', 0);
 INSERT INTO resources VALUES ('Pesticides', 0, 'pieces', 2);
 DROP TABLE IF EXISTS lands;
-CREATE TABLE IF NOT EXISTS lands (class text, id INTEGER PRIMARY KEY AUTOINCREMENT, growth_rate integer, price integer, plants integer);
+CREATE TABLE IF NOT EXISTS lands (class text, id INTEGER PRIMARY KEY AUTOINCREMENT, growth_rate integer, price integer, plants integer, growth_percentage integer);
